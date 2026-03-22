@@ -7,6 +7,7 @@ const methodOverride = require("method-override");
 const ejsmate = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
+const  Review = require("./models/review.js");
 const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 const {listingSchema} = require("./schema.js");
 
@@ -88,6 +89,19 @@ app.delete("/listings/:id", wrapAsync(async (req, res) => {
   console.log(deletedListing);
   res.redirect("/listings");
 }));
+//Reviews
+app.post("/listings/:id/reviews",async(req,res)=>{
+   let listing = await Listing.findById(req.params.id);
+   console.log(listing);
+   let newreview = new Review(req.body.Review);
+   console.log(newreview);
+   listing.reviews.push(newreview);
+
+   await newreview.save();
+   await listing.save();
+
+   res.redirect(`/listings/${listing._id}`);
+});
 
 // app.get("/testListing", async (req, res) => {
 //   let sampleListing = new Listing({
