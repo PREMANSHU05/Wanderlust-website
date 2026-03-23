@@ -9,7 +9,7 @@ const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
 const  Review = require("./models/review.js");
 const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
-const {listingSchema} = require("./schema.js");
+const {listingSchema,reviewSchema} = require("./schema.js");
 
 main()
   .then(() => {
@@ -37,7 +37,16 @@ const validateListing = (req,res,next)=>{
   let {error} = listingSchema.validate(req.body);
   if(error){
     let errMsg = error.details.map((el) => el.message).join(",");
-    throw new ExpressError (400,err);
+    throw new ExpressError (400,errMsg);
+  }else{
+    next();
+  }
+}
+const validatereview = (req,res,next)=>{
+  let {error} = reviewSchema.validate(req.body);
+  if(error){
+    let errMsg = error.details.map((el) => el.message).join(",");
+    throw new ExpressError (400,errMsg);
   }else{
     next();
   }
@@ -56,7 +65,7 @@ app.get("/listings/new", (req, res) => {
 //Show Route
 app.get("/listings/:id", wrapAsync(async (req, res) => {
   let { id } = req.params;
-  const listing = await Listing.findById(id);
+  const listing = await Listing.findById(id).populate("reviews");
   res.render("show.ejs", { listing });
 }));
 
@@ -90,18 +99,16 @@ app.delete("/listings/:id", wrapAsync(async (req, res) => {
   res.redirect("/listings");
 }));
 //Reviews
-app.post("/listings/:id/reviews",async(req,res)=>{
+app.post("/listings/:id/reviews", validatereview, wrapAsync(async(req,res)=>{
    let listing = await Listing.findById(req.params.id);
-   console.log(listing);
-   let newreview = new Review(req.body.Review);
-   console.log(newreview);
+   let newreview = new Review(req.body.review);
    listing.reviews.push(newreview);
 
    await newreview.save();
    await listing.save();
 
    res.redirect(`/listings/${listing._id}`);
-});
+}));
 
 // app.get("/testListing", async (req, res) => {
 //   let sampleListing = new Listing({
@@ -122,7 +129,7 @@ app.use((req,res,next)=>{
 
 app.use((err,req,res,next)=>{
   let {statusCode=500,message="not found"}=err;
-  res.render("error.ejs",{message});
+  res.status(statusCode).render("error.ejs",{message});
 });
 
 
