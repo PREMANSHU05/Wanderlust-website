@@ -4,6 +4,7 @@ const users = require("./routes/user.js");
 const posts = require("./routes/post.js");
 // Cookie parser
 const cookieParser = require("cookie-parser");
+//express session
 const session = require("express-session");
 const flash = require("connect-flash");
 const path = require("path");
