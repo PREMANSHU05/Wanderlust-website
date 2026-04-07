@@ -19,7 +19,7 @@
 </div>
     </div>
     <br>
-    <% if(currUser && listing.owner._id.equals(currUser._id)){%>
+    <% if(currUser && listing.owner._id.equals(currUser._id))  { %>
     <div class="btns">
 <a href="/listings/<%= listing._id %>/edit" 
   class="btn btn-dark col-1 offset-3 
@@ -45,7 +45,7 @@
           class="form-range">
         </div> -->
         <div class="mb-3 mt-3">
-          <label for="rating" class="form-label">Rating</label></label>
+          <label for="rating" class="form-label">Rating</label>
         <fieldset class="starability-slot">
   <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="0" checked aria-label="No rating." />
   <input type="radio" id="first-rate1" name="rating" value="1" />
